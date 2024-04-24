@@ -1,6 +1,6 @@
 openapi: '3.1.1'
 
-info:
+info: sdsdsd
   title: Manage user accounts (people)
   description: A demo API that manages user account records.
   summary: |
