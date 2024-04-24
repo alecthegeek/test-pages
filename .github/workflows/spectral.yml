@@ -4,9 +4,6 @@ on:
   # Runs on pushes targeting the default branch
   push:
     branches: ["main"]
-# Permission can be added at job level or workflow level
-permissions:
-  contents: write   # This is required to create/push the new git tag
 
 jobs:
   build:
