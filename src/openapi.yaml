@@ -1,0 +1,172 @@
+openapi: '3.1.1'
+
+info:
+  title: Manage user accounts (people)
+  description: A demo API that manages user account records.
+  summary: |
+    This simple API allows you to manage people in a user membership database.
+
+    It is for demonstration purposes only.
+  version: 0.1.0
+  contact:
+    name: alecthegeek
+    url: https://gitlab.com/alecthegeek/docs-as-code
+  license:
+    name: "Attribution-ShareAlike 4.0 International"
+    url: "https://creativecommons.org/licenses/by-sa/4.0/deed.en"
+
+servers:
+- url: http://localhost:8000
+  description: Test server on local machine.
+
+tags:
+  - name: people
+    description: An API all about people.
+
+paths:
+  /people:
+    get:
+      operationId: "getusers"
+      security: []
+      summary: Get a list of all the users
+      description: This will return a dump of ALL records in the user database. Use with care!.
+      tags:
+        - people
+      responses:
+        '200':
+          description: A list of all the users. NOTE - User records are returned as [JSON lines](https://jsonlines.org/).
+          content:
+            application/jsonl+json:
+              schema:
+                type: object
+                items:
+                  properties:
+                    userID:
+                      type: integer
+                    firstname:
+                      type: string
+                    lastname:
+                      type: string
+                    type:
+                      type: string
+                    address:
+                      $ref: "#/components/schemas/address"
+                example: {"userID":1,"firstname":"John","lastname":"Doe","address":{"city":"City X","state":"State X"},"Type":"Contractor"}
+        '204':
+          description: No users found in database.
+        '404':
+          description: No users found in database.
+        default:
+          description: Unexpected error. Please contact support.
+    post:
+      operationId: "addPerson"
+      security: []
+      summary: Add a new person to the user account database.
+      description: Updates the server account database with a new record.
+      tags:
+        - people
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstname:
+                  type: string
+                lastname:
+                  type: string
+                type:
+                  type: string
+                address:
+                 $ref: "#/components/schemas/address"
+      responses:
+        '201':
+          description: New record created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userID:
+                    description: Unique user ID (Membership number)
+                    type: integer
+                    minimum: 0001
+                    maximum: 9999
+        '409':
+          description: Record already exists.
+
+  /people/{userId}:
+    get:
+      operationId: "getuser"
+      security: []
+      summary: Get all details for a specific user by ID
+      description: Returns user account information.
+      tags:
+        - people
+      parameters:
+        - in: path
+          name: userId
+          description: User's unique id (membership number).
+          required: true
+          schema:
+            type: integer
+            minimum: 0001
+            maximum: 9999
+      responses:
+        '200':
+          description: User details located.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userID:
+                    type: integer
+                  firstname:
+                    type: string
+                  lastname:
+                    type: string
+                  type:
+                    type: string
+                  address:
+                    $ref: "#/components/schemas/address"
+                example: {"userID":1,"firstname":"John","lastname":"Doe","address":{"city":"City X","state":"State X"},"type":"Contractor"}
+        '404':
+          description: User record not found.
+        default:
+          description: Unexpected error. Contact support for further information.
+
+    delete:
+      operationId: "deleteuser"
+      security: []
+      summary: Mark a specific user account as inactive.
+      description: Marks a user account as inactive. Information is retained for audit purposes. If a deleted user needs to be removed from the database contact support.
+      tags:
+        - people
+      parameters:
+        - in: path
+          name: userId
+          description: User's unique id (membership number).
+          required: true
+          schema:
+            type: integer
+            minimum: 0001
+            maximum: 9999
+      responses:
+        '200':
+          description: User record was deleted successfully.
+        '404':
+          description: User record not found. 
+        default:
+          description: Unexpected error. Contact support.
+
+components:
+  schemas:
+    address:
+      description: A persons location details.
+      type: object
+      properties:
+        city:
+          type: string
+        state:
+          type: string
